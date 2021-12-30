@@ -4,6 +4,7 @@
 // @description NBA楽天のライブ配信時特定のアイコンのコメントを削除する
 // @include     https://nba.rakuten.co.jp/games/*
 // @version     1.0.0
+// @updateURL   https://github.com/nn-nito/NBARakutenCommentRemover/raw/master/commentRemover.user.js
 // @grant       none
 // ==/UserScript==
 
