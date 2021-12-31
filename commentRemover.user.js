@@ -3,9 +3,9 @@
 // @namespace   nn-nito
 // @description NBA楽天のライブ配信時特定のアイコンのコメントを削除する
 // @include     https://nba.rakuten.co.jp/games/*
-// @version     1.0.0
-// @updateURL   https://github.com/nn-nito/NBARakutenCommentRemover/raw/master/commentRemover.user.js
+// @version     1.0.1
 // @grant       none
+// @noframes
 // ==/UserScript==
 
 (() => {
@@ -80,6 +80,10 @@
     ];
     //===========================================================================
 
+    /** 定数 */
+    const DISPLAYCOMMENT = '#このコメントは削除されました';
+    const DISPLAYNG = '#NGコメント';
+
     /** メンバ */
     var commentSection;
 
@@ -111,11 +115,11 @@
     /* コメントの追加を監視 */
     function monitorCommnetInsertion() {
         commentSection.addEventListener('DOMNodeInserted', function (element) {
-            if (TEAMTARGETREMOVALLIST !== []) {
+            if (TEAMTARGETREMOVALLIST.length !== 0) {
                 // アイコン コメント削除
                 removeCommentByIcon(element);
             }
-            if (NGCOMMENTLIST !== []) {
+            if (NGCOMMENTLIST.length !== 0) {
                 // NGコメント コメント削除
                 removeCommentByNG(element);
             }
@@ -133,8 +137,9 @@
         if (teamId in TEAMTARGETREMOVALLIST === false) return;
 
         if (img.src === `https://image.nba.rakuten.co.jp/media/user/profile/icon/${teamId}.png?imwidth=64`) {
-            // 削除
-            target.remove();
+            // 削除 実際には削除せずテキストを置き換え
+            let comment = getComment(target);
+            comment.textContent = DISPLAYCOMMENT;
         }
     }
 
@@ -143,17 +148,21 @@
         let target = element.target;
         if (target.className !== 'ChatCard') return;
 
-        const comment = getComment(target);
+        let comment = getComment(target);
         const content = comment.textContent;
+        let isRemoval = false;
 
         NGCOMMENTLIST.forEach((ng) => {
             const pattern = new RegExp('.*' + ng + '.*');
             const match = content.match(pattern);
-            if (match == null) return;
+            if (match === null) return; // 不一致
 
-            // 削除
-            target.remove();
+            isRemoval = true;
         });
+        if (isRemoval) {
+            // 削除 実際には削除せずテキストを置き換え
+            comment.textContent = DISPLAYNG;
+        }
     }
 
     // 実行
